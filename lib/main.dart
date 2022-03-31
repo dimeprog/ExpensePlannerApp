@@ -1,8 +1,6 @@
-import 'package:expenseplannerapp/widget/Transaction_list.dart';
-import 'package:expenseplannerapp/widget/userInput_transaction.dart';
+import 'package:expenseplannerapp/widget/user_transaction.dart';
 import 'package:flutter/material.dart';
 import 'model/transactions.dart';
-import 'package:intl/intl.dart';
 
 void main() => runApp(const MyApp());
 
@@ -50,8 +48,7 @@ class MyHomePage extends StatelessWidget {
                 color: Colors.blue,
               ),
             ),
-            UserInputTransaction(),
-            TransactionList(),
+            const UserTransaction(),
           ],
         ),
       ),

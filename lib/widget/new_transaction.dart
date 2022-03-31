@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class UserInputTransaction extends StatelessWidget {
+class NewTransaction extends StatelessWidget {
   final titleController = TextEditingController();
   final amountController = TextEditingController();
 
