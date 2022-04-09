@@ -2,70 +2,78 @@ import 'package:flutter/material.dart';
 import '../model/transactions.dart';
 import 'package:intl/intl.dart';
 
-class TransactionList extends StatefulWidget {
-  @override
-  State<TransactionList> createState() => _TransactionListState();
-}
+class TransactionList extends StatelessWidget {
+  final List<Transaction> transaction;
 
-class _TransactionListState extends State<TransactionList> {
-  final List<Transaction> _userTransaction = [
-    Transaction(
-      id: 't1',
-      title: 'Monthly data',
-      amount: 12000,
-      date: DateTime.now(),
-    ),
-    Transaction(
-      id: 't2',
-      title: 'Food',
-      amount: 59000,
-      date: DateTime.now(),
-    ),
-  ];
+  TransactionList(this.transaction);
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        ..._userTransaction.map((tx) {
-          return Card(
-            child: Row(children: [
-              Container(
-                margin:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                decoration: BoxDecoration(
-                    border: Border.all(
-                  width: 1.5,
-                  color: Colors.purple,
-                )),
-                padding: const EdgeInsets.all(10),
-                child: Text(
-                  tx.amount.toString(),
-                  style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.purple),
-                ),
+    return Expanded(
+      child: SizedBox(
+        height: 200,
+        child: transaction.isEmpty
+            ? Column(
+                children: [
+                  Text(
+                    'No transaction',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    height: 200,
+                    child: Image.asset('assets/images/waiting.png'),
+                  ),
+                ],
+              )
+            : ListView.builder(
+                scrollDirection: Axis.vertical,
+                itemCount: transaction.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Card(
+                    child: Row(
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 15),
+                          decoration: BoxDecoration(
+                              border: Border.all(
+                            width: 1.5,
+                            color: Colors.purple,
+                          )),
+                          padding: const EdgeInsets.all(10),
+                          child: Text(
+                            '\$${transaction[index].amount.toStringAsFixed(2)}',
+                            style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.purple),
+                          ),
+                        ),
+                        Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                transaction[index].title,
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                              Text(
+                                DateFormat.yMMMd()
+                                    .format(transaction[index].date),
+                                style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey),
+                              ),
+                            ]),
+                      ],
+                    ),
+                  );
+                },
               ),
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(
-                  tx.title,
-                  style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black),
-                ),
-                Text(
-                  DateFormat.yMMMd().format(tx.date),
-                  style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey),
-                ),
-              ]),
-            ]),
-          );
-        }).toList()
-      ],
+      ),
     );
   }
 }

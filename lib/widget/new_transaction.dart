@@ -1,8 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
-class NewTransaction extends StatelessWidget {
+class NewTransaction extends StatefulWidget {
+  final Function addTransactionFunc;
+  NewTransaction(this.addTransactionFunc);
+
+  @override
+  State<NewTransaction> createState() => _NewTransactionState();
+}
+
+class _NewTransactionState extends State<NewTransaction> {
   final titleController = TextEditingController();
+
   final amountController = TextEditingController();
+
+  void onSubmitData() {
+    final enterTitle = titleController.text;
+    final enterAmount = double.tryParse(amountController.text);
+    if (enterTitle.isEmpty || enterAmount == Null || enterAmount! <= 0) {
+      return;
+    }
+
+    widget.addTransactionFunc(
+      enterTitle,
+      enterAmount,
+    );
+    Navigator.of(context).pop();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,13 +39,16 @@ class NewTransaction extends StatelessWidget {
           children: [
             TextField(
               controller: titleController,
+              onSubmitted: (_) => onSubmitData(),
               // onChanged: (value) => titleInput = value,
               decoration: const InputDecoration(
                 labelText: 'Title',
               ),
             ),
             TextField(
+              keyboardType: TextInputType.number,
               controller: amountController,
+              onSubmitted: (_) => onSubmitData(),
               // onChanged: (value) => amountInput = value,
               decoration: const InputDecoration(
                 labelText: 'Amount',
@@ -35,10 +62,7 @@ class NewTransaction extends StatelessWidget {
                 ),
               ),
               textColor: Colors.purple,
-              onPressed: () {
-                print(titleController.text);
-                print(amountController.text);
-              },
+              onPressed: onSubmitData,
             ),
           ],
         ),
