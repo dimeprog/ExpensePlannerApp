@@ -1,4 +1,5 @@
 import 'package:expenseplannerapp/widget/Transaction_list.dart';
+import 'package:expenseplannerapp/widget/chart.dart';
 import 'package:expenseplannerapp/widget/new_transaction.dart';
 import 'package:flutter/material.dart';
 import 'model/transactions.dart';
@@ -17,6 +18,20 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.purple,
         accentColor: Colors.amber,
         fontFamily: 'Quicksand',
+        textTheme: ThemeData.light().textTheme.copyWith(
+                titleMedium: const TextStyle(
+              fontFamily: 'OPenSans',
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            )),
+        appBarTheme: AppBarTheme(
+          textTheme: ThemeData.light().textTheme.copyWith(
+                  titleMedium: const TextStyle(
+                fontFamily: 'OPenSans',
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              )),
+        ),
       ),
       home: MyHomePage(),
     );
@@ -42,7 +57,79 @@ class _MyHomePageState extends State<MyHomePage> {
       amount: 59000,
       date: DateTime.now(),
     ),
+    Transaction(
+      id: 't1',
+      title: 'Monthly data',
+      amount: 12000,
+      date: DateTime.now(),
+    ),
+    Transaction(
+      id: 't2',
+      title: 'Food',
+      amount: 59000,
+      date: DateTime.now(),
+    ),
+    Transaction(
+      id: 't1',
+      title: 'Monthly data',
+      amount: 12000,
+      date: DateTime.now(),
+    ),
+    Transaction(
+      id: 't2',
+      title: 'Food',
+      amount: 59000,
+      date: DateTime.now(),
+    ),
+    Transaction(
+      id: 't1',
+      title: 'Monthly data',
+      amount: 12000,
+      date: DateTime.now(),
+    ),
+    Transaction(
+      id: 't2',
+      title: 'Food',
+      amount: 59000,
+      date: DateTime.now(),
+    ),
+    Transaction(
+      id: 't1',
+      title: 'Monthly data',
+      amount: 12000,
+      date: DateTime.now(),
+    ),
+    Transaction(
+      id: 't2',
+      title: 'Food',
+      amount: 59000,
+      date: DateTime.now(),
+    ),
+    Transaction(
+      id: 't1',
+      title: 'Monthly data',
+      amount: 12000,
+      date: DateTime.now(),
+    ),
+    Transaction(
+      id: 't2',
+      title: 'Food',
+      amount: 59000,
+      date: DateTime.now(),
+    ),
   ];
+
+  Iterable<Transaction> get _recentTransaction {
+    return _userTransaction
+        .where(
+          (tx) => tx.date.isAfter(
+            DateTime.now().subtract(
+              Duration(days: 7),
+            ),
+          ),
+        )
+        .toList();
+  }
 
   void _addNewTransaction(String txTitle, double txAmount) {
     final newTx = Transaction(
@@ -82,25 +169,17 @@ class _MyHomePageState extends State<MyHomePage> {
           )
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              height: 50,
-              width: double.infinity,
-              child: const Card(
-                child: Text(
-                  'Chart',
-                  textAlign: TextAlign.center,
-                ),
-                color: Colors.blue,
-              ),
-            ),
-            TransactionList(_userTransaction)
-          ],
-        ),
+      body: Column(
+        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Chart(_userTransaction),
+          Chart(_userTransaction),
+          const SizedBox(
+            height: 15,
+          ),
+          TransactionList(_userTransaction)
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
