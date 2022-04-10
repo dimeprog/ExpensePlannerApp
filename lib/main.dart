@@ -26,11 +26,12 @@ class MyApp extends StatelessWidget {
             )),
         appBarTheme: AppBarTheme(
           textTheme: ThemeData.light().textTheme.copyWith(
-                  titleMedium: const TextStyle(
-                fontFamily: 'OPenSans',
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-              )),
+                titleMedium: const TextStyle(
+                  fontFamily: 'OPenSans',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
         ),
       ),
       home: MyHomePage(),
@@ -45,78 +46,78 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final List<Transaction> _userTransaction = [
-    Transaction(
-      id: 't1',
-      title: 'Monthly data',
-      amount: 12000,
-      date: DateTime.now(),
-    ),
-    Transaction(
-      id: 't2',
-      title: 'Food',
-      amount: 59000,
-      date: DateTime.now(),
-    ),
-    Transaction(
-      id: 't1',
-      title: 'Monthly data',
-      amount: 12000,
-      date: DateTime.now(),
-    ),
-    Transaction(
-      id: 't2',
-      title: 'Food',
-      amount: 59000,
-      date: DateTime.now(),
-    ),
-    Transaction(
-      id: 't1',
-      title: 'Monthly data',
-      amount: 12000,
-      date: DateTime.now(),
-    ),
-    Transaction(
-      id: 't2',
-      title: 'Food',
-      amount: 59000,
-      date: DateTime.now(),
-    ),
-    Transaction(
-      id: 't1',
-      title: 'Monthly data',
-      amount: 12000,
-      date: DateTime.now(),
-    ),
-    Transaction(
-      id: 't2',
-      title: 'Food',
-      amount: 59000,
-      date: DateTime.now(),
-    ),
-    Transaction(
-      id: 't1',
-      title: 'Monthly data',
-      amount: 12000,
-      date: DateTime.now(),
-    ),
-    Transaction(
-      id: 't2',
-      title: 'Food',
-      amount: 59000,
-      date: DateTime.now(),
-    ),
-    Transaction(
-      id: 't1',
-      title: 'Monthly data',
-      amount: 12000,
-      date: DateTime.now(),
-    ),
-    Transaction(
-      id: 't2',
-      title: 'Food',
-      amount: 59000,
-      date: DateTime.now(),
-    ),
+    // Transaction(
+    //   id: 't1',
+    //   title: 'Monthly data',
+    //   amount: 12000,
+    //   date: DateTime.now(),
+    // ),
+    // Transaction(
+    //   id: 't2',
+    //   title: 'Food',
+    //   amount: 59000,
+    //   date: DateTime.now(),
+    // ),
+    // Transaction(
+    //   id: 't1',
+    //   title: 'Monthly data',
+    //   amount: 12000,
+    //   date: DateTime.now(),
+    // ),
+    // Transaction(
+    //   id: 't2',
+    //   title: 'Food',
+    //   amount: 59000,
+    //   date: DateTime.now(),
+    // ),
+    // Transaction(
+    //   id: 't1',
+    //   title: 'Monthly data',
+    //   amount: 12000,
+    //   date: DateTime.now(),
+    // ),
+    // Transaction(
+    //   id: 't2',
+    //   title: 'Food',
+    //   amount: 59000,
+    //   date: DateTime.now(),
+    // ),
+    // Transaction(
+    //   id: 't1',
+    //   title: 'Monthly data',
+    //   amount: 12000,
+    //   date: DateTime.now(),
+    // ),
+    // Transaction(
+    //   id: 't2',
+    //   title: 'Food',
+    //   amount: 59000,
+    //   date: DateTime.now(),
+    // ),
+    // Transaction(
+    //   id: 't1',
+    //   title: 'Monthly data',
+    //   amount: 12000,
+    //   date: DateTime.now(),
+    // ),
+    // Transaction(
+    //   id: 't2',
+    //   title: 'Food',
+    //   amount: 59000,
+    //   date: DateTime.now(),
+    // ),
+    // Transaction(
+    //   id: 't1',
+    //   title: 'Monthly data',
+    //   amount: 12000,
+    //   date: DateTime.now(),
+    // ),
+    // Transaction(
+    //   id: 't2',
+    //   title: 'Food',
+    //   amount: 59000,
+    //   date: DateTime.now(),
+    // ),
   ];
 
   Iterable<Transaction> get _recentTransaction {
@@ -131,12 +132,14 @@ class _MyHomePageState extends State<MyHomePage> {
         .toList();
   }
 
-  void _addNewTransaction(String txTitle, double txAmount) {
+  void _addNewTransaction(
+      String txTitle, double txAmount, DateTime choosenDate) {
     final newTx = Transaction(
-        id: DateTime.now().toString(),
-        title: txTitle,
-        amount: txAmount,
-        date: DateTime.now());
+      id: DateTime.now().toString(),
+      title: txTitle,
+      amount: txAmount,
+      date: choosenDate,
+    );
 
     setState(() {
       _userTransaction.add(newTx);
@@ -153,6 +156,12 @@ class _MyHomePageState extends State<MyHomePage> {
             behavior: HitTestBehavior.opaque,
           );
         });
+  }
+
+  void _deleteTransaction(String id) {
+    setState(() {
+      _userTransaction.removeWhere((tx) => tx.id == id);
+    });
   }
 
   @override
@@ -178,7 +187,7 @@ class _MyHomePageState extends State<MyHomePage> {
           const SizedBox(
             height: 15,
           ),
-          TransactionList(_userTransaction)
+          TransactionList(_userTransaction, _deleteTransaction)
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
