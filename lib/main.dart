@@ -1,10 +1,18 @@
+import 'dart:io';
 import 'package:expenseplannerapp/widget/Transaction_list.dart';
 import 'package:expenseplannerapp/widget/chart.dart';
 import 'package:expenseplannerapp/widget/new_transaction.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'model/transactions.dart';
 
-void main() => runApp(const MyApp());
+void main() {
+  // WidgetsFlutterBinding.ensureInitialized();
+  // SystemChrome.setPreferredOrientations(
+  //     [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -45,6 +53,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool _showchart = false;
   final List<Transaction> _userTransaction = [
     // Transaction(
     //   id: 't1',
@@ -166,37 +175,111 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Expenses Recorder'),
-        actions: [
-          IconButton(
-            onPressed: () => _startTransaction(context),
-            icon: const Icon(
-              Icons.add,
-            ),
-          )
-        ],
-      ),
-      body: Column(
-        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // Chart(_userTransaction),
-          Chart(_userTransaction),
-          const SizedBox(
-            height: 15,
-          ),
-          TransactionList(_userTransaction, _deleteTransaction)
-        ],
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _startTransaction(context),
-        child: const Icon(
-          Icons.add,
-        ),
+    final mediaQuery = MediaQuery.of(context);
+    final isLasndScape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+    final CuAppBar = CupertinoNavigationBar(
+      middle: Text('Expenses Recorder'),
+      trailing: GestureDetector(
+        child: Icon(CupertinoIcons.add),
+        onTap: () => _startTransaction(context),
       ),
     );
+    final PreferredSizeWidget appBar = Platform.isIOS
+        ? PreferredSize(
+            preferredSize: Size.fromHeight(mediaQuery.size.height * 0.08),
+            child: CupertinoNavigationBar(
+              middle: Text('Expenses Recorder'),
+              trailing: GestureDetector(
+                child: Icon(CupertinoIcons.add),
+                onTap: () => _startTransaction(context),
+              ),
+            ),
+          )
+        : AppBar(
+            title: const Text('Expenses Recorder'),
+            actions: [
+              IconButton(
+                onPressed: () => _startTransaction(context),
+                icon: const Icon(
+                  Icons.add,
+                ),
+              )
+            ],
+          );
+
+    final chartContainer = Container(
+      child: Chart(_userTransaction),
+      height: (mediaQuery.size.height -
+              appBar.preferredSize.height -
+              mediaQuery.padding.top) *
+          0.3,
+    );
+    final txListContainer = Container(
+      child: TransactionList(_userTransaction, _deleteTransaction),
+      height: (mediaQuery.size.height -
+              appBar.preferredSize.height -
+              mediaQuery.padding.top) *
+          0.6,
+    );
+    final pagebody = SafeArea(
+      child: Column(
+        // mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (isLasndScape)
+                Switch.adaptive(
+                    value: _showchart,
+                    onChanged: (val) {
+                      setState(() {
+                        _showchart = val;
+                      });
+                    }),
+            ],
+          ),
+          if (isLasndScape)
+            _showchart
+                ? Container(
+                    child: Chart(_userTransaction),
+                    height: (mediaQuery.size.height -
+                            appBar.preferredSize.height -
+                            mediaQuery.padding.top) *
+                        0.7,
+                  )
+                : Container(
+                    child:
+                        TransactionList(_userTransaction, _deleteTransaction),
+                    height: (mediaQuery.size.height -
+                            appBar.preferredSize.height -
+                            mediaQuery.padding.top) *
+                        0.5,
+                  ),
+          if (!isLasndScape) chartContainer,
+          if (!isLasndScape) txListContainer,
+        ],
+      ),
+    );
+    return Platform.isIOS
+        ? CupertinoPageScaffold(
+            child: pagebody,
+            navigationBar: CuAppBar,
+          )
+        : Scaffold(
+            appBar: appBar,
+            body: pagebody,
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerDocked,
+            floatingActionButton: Platform.isIOS
+                ? Container()
+                : FloatingActionButton(
+                    onPressed: () => _startTransaction(context),
+                    child: const Icon(
+                      Icons.add,
+                    ),
+                  ),
+          );
   }
 }
