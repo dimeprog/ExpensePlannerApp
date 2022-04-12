@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'package:expenseplannerapp/widget/Transaction_list.dart';
 import 'package:expenseplannerapp/widget/chart.dart';
 import 'package:expenseplannerapp/widget/new_transaction.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'model/transactions.dart';
@@ -173,38 +175,55 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
     final isLasndScape =
         MediaQuery.of(context).orientation == Orientation.landscape;
-
-    final appBar = AppBar(
-      title: const Text('Expenses Recorder'),
-      actions: [
-        IconButton(
-          onPressed: () => _startTransaction(context),
-          icon: const Icon(
-            Icons.add,
-          ),
-        )
-      ],
+    final CuAppBar = CupertinoNavigationBar(
+      middle: Text('Expenses Recorder'),
+      trailing: GestureDetector(
+        child: Icon(CupertinoIcons.add),
+        onTap: () => _startTransaction(context),
+      ),
     );
+    final PreferredSizeWidget appBar = Platform.isIOS
+        ? PreferredSize(
+            preferredSize: Size.fromHeight(mediaQuery.size.height * 0.08),
+            child: CupertinoNavigationBar(
+              middle: Text('Expenses Recorder'),
+              trailing: GestureDetector(
+                child: Icon(CupertinoIcons.add),
+                onTap: () => _startTransaction(context),
+              ),
+            ),
+          )
+        : AppBar(
+            title: const Text('Expenses Recorder'),
+            actions: [
+              IconButton(
+                onPressed: () => _startTransaction(context),
+                icon: const Icon(
+                  Icons.add,
+                ),
+              )
+            ],
+          );
 
     final chartContainer = Container(
       child: Chart(_userTransaction),
-      height: (MediaQuery.of(context).size.height -
+      height: (mediaQuery.size.height -
               appBar.preferredSize.height -
-              MediaQuery.of(context).padding.top) *
+              mediaQuery.padding.top) *
           0.3,
     );
     final txListContainer = Container(
       child: TransactionList(_userTransaction, _deleteTransaction),
-      height: (MediaQuery.of(context).size.height -
+      height: (mediaQuery.size.height -
               appBar.preferredSize.height -
-              MediaQuery.of(context).padding.top) *
+              mediaQuery.padding.top) *
           0.6,
     );
-    return Scaffold(
-      appBar: appBar,
-      body: Column(
+    final pagebody = SafeArea(
+      child: Column(
         // mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -212,7 +231,7 @@ class _MyHomePageState extends State<MyHomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (isLasndScape)
-                Switch(
+                Switch.adaptive(
                     value: _showchart,
                     onChanged: (val) {
                       setState(() {
@@ -225,30 +244,42 @@ class _MyHomePageState extends State<MyHomePage> {
             _showchart
                 ? Container(
                     child: Chart(_userTransaction),
-                    height: (MediaQuery.of(context).size.height -
+                    height: (mediaQuery.size.height -
                             appBar.preferredSize.height -
-                            MediaQuery.of(context).padding.top) *
+                            mediaQuery.padding.top) *
                         0.7,
                   )
                 : Container(
                     child:
                         TransactionList(_userTransaction, _deleteTransaction),
-                    height: (MediaQuery.of(context).size.height -
+                    height: (mediaQuery.size.height -
                             appBar.preferredSize.height -
-                            MediaQuery.of(context).padding.top) *
+                            mediaQuery.padding.top) *
                         0.5,
                   ),
           if (!isLasndScape) chartContainer,
           if (!isLasndScape) txListContainer,
         ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _startTransaction(context),
-        child: const Icon(
-          Icons.add,
-        ),
-      ),
     );
+    return Platform.isIOS
+        ? CupertinoPageScaffold(
+            child: pagebody,
+            navigationBar: CuAppBar,
+          )
+        : Scaffold(
+            appBar: appBar,
+            body: pagebody,
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerDocked,
+            floatingActionButton: Platform.isIOS
+                ? Container()
+                : FloatingActionButton(
+                    onPressed: () => _startTransaction(context),
+                    child: const Icon(
+                      Icons.add,
+                    ),
+                  ),
+          );
   }
 }
