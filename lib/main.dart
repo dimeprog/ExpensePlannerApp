@@ -2,9 +2,15 @@ import 'package:expenseplannerapp/widget/Transaction_list.dart';
 import 'package:expenseplannerapp/widget/chart.dart';
 import 'package:expenseplannerapp/widget/new_transaction.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'model/transactions.dart';
 
-void main() => runApp(const MyApp());
+void main() {
+  // WidgetsFlutterBinding.ensureInitialized();
+  // SystemChrome.setPreferredOrientations(
+  //     [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -45,6 +51,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool _showchart = false;
   final List<Transaction> _userTransaction = [
     // Transaction(
     //   id: 't1',
@@ -166,28 +173,73 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isLasndScape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+
+    final appBar = AppBar(
+      title: const Text('Expenses Recorder'),
+      actions: [
+        IconButton(
+          onPressed: () => _startTransaction(context),
+          icon: const Icon(
+            Icons.add,
+          ),
+        )
+      ],
+    );
+
+    final chartContainer = Container(
+      child: Chart(_userTransaction),
+      height: (MediaQuery.of(context).size.height -
+              appBar.preferredSize.height -
+              MediaQuery.of(context).padding.top) *
+          0.3,
+    );
+    final txListContainer = Container(
+      child: TransactionList(_userTransaction, _deleteTransaction),
+      height: (MediaQuery.of(context).size.height -
+              appBar.preferredSize.height -
+              MediaQuery.of(context).padding.top) *
+          0.6,
+    );
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Expenses Recorder'),
-        actions: [
-          IconButton(
-            onPressed: () => _startTransaction(context),
-            icon: const Icon(
-              Icons.add,
-            ),
-          )
-        ],
-      ),
+      appBar: appBar,
       body: Column(
-        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        // mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Chart(_userTransaction),
-          Chart(_userTransaction),
-          const SizedBox(
-            height: 15,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (isLasndScape)
+                Switch(
+                    value: _showchart,
+                    onChanged: (val) {
+                      setState(() {
+                        _showchart = val;
+                      });
+                    }),
+            ],
           ),
-          TransactionList(_userTransaction, _deleteTransaction)
+          if (isLasndScape)
+            _showchart
+                ? Container(
+                    child: Chart(_userTransaction),
+                    height: (MediaQuery.of(context).size.height -
+                            appBar.preferredSize.height -
+                            MediaQuery.of(context).padding.top) *
+                        0.7,
+                  )
+                : Container(
+                    child:
+                        TransactionList(_userTransaction, _deleteTransaction),
+                    height: (MediaQuery.of(context).size.height -
+                            appBar.preferredSize.height -
+                            MediaQuery.of(context).padding.top) *
+                        0.5,
+                  ),
+          if (!isLasndScape) chartContainer,
+          if (!isLasndScape) txListContainer,
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
