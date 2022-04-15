@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import '../model/transactions.dart';
 import 'package:intl/intl.dart';
+import 'transaction_item.dart';
 
 class TransactionList extends StatelessWidget {
-  final List<Transaction> transaction;
+  final List<Transaction> transactions;
   final Function deleteTx;
 
-  TransactionList(this.transaction, this.deleteTx);
+  TransactionList(this.transactions, this.deleteTx);
 
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
-    return transaction.isEmpty
+    return transactions.isEmpty
         ? LayoutBuilder(builder: ((context, constraints) {
             return Column(
               children: [
@@ -29,57 +30,19 @@ class TransactionList extends StatelessWidget {
               ],
             );
           }))
-        : ListView.builder(
-            scrollDirection: Axis.vertical,
-            itemCount: transaction.length,
-            itemBuilder: (BuildContext context, int index) {
-              return Card(
-                margin:
-                    const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-                elevation: 6,
-                child: ListTile(
-                  leading: CircleAvatar(
-                    radius: 35,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: FittedBox(
-                        child: Text(
-                          '\$${transaction[index].amount.toStringAsFixed(0)}',
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ),
-                  title: Text(
-                    transaction[index].title,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  subtitle: Text(
-                    DateFormat.yMMMd().format(transaction[index].date),
-                    style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey),
-                  ),
-                  trailing: mediaQuery.size.width > 460
-                      ? FlatButton.icon(
-                          icon: Icon(Icons.delete),
-                          onPressed: () => deleteTx(transaction[index].id),
-                          textColor: Theme.of(context).errorColor,
-                          label: Text('Delete'),
-                        )
-                      : IconButton(
-                          icon: Icon(Icons.delete),
-                          onPressed: () => deleteTx(transaction[index].id),
-                          color: Theme.of(context).errorColor,
-                        ),
-                ),
-              );
-            },
+        : ListView(
+            children: transactions
+                .map((tx) => TransactionItem(
+                      key: ValueKey(tx.id),
+                      transaction: tx,
+                      mediaQuery: mediaQuery,
+                      deleteTx: deleteTx,
+                    ))
+                .toList(),
           );
   }
 }
+
 
 
 // Card(

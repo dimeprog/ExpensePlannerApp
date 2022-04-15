@@ -52,8 +52,27 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   bool _showchart = false;
+
+  @override
+  void initState() {
+    WidgetsBinding.instance?.addObserver(this);
+    super.initState();
+  }
+
+  //
+  @override
+  void didChangeApplifeCycleState(AppLifecycleState state) {
+    print(state);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance?.removeObserver(this);
+    super.dispose();
+  }
+
   final List<Transaction> _userTransaction = [
     // Transaction(
     //   id: 't1',
@@ -173,11 +192,63 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  List<Widget> _buildLandScapeContent(MediaQueryData mediaQuery, var appBar) {
+    return [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Switch.adaptive(
+              value: _showchart,
+              onChanged: (val) {
+                setState(() {
+                  _showchart = val;
+                });
+              }),
+        ],
+      ),
+      _showchart
+          ? Container(
+              child: Chart(_userTransaction),
+              height: (mediaQuery.size.height -
+                      appBar.preferredSize.height -
+                      mediaQuery.padding.top) *
+                  0.7,
+            )
+          : Container(
+              child: TransactionList(_userTransaction, _deleteTransaction),
+              height: (mediaQuery.size.height -
+                      appBar.preferredSize.height -
+                      mediaQuery.padding.top) *
+                  0.5,
+            ),
+    ];
+  }
+
+  List<Widget> _buildPortraitContent(MediaQueryData mediaQuery, var appBar) {
+    return [
+      Container(
+        child: Chart(_userTransaction),
+        height: (mediaQuery.size.height -
+                appBar.preferredSize.height -
+                mediaQuery.padding.top) *
+            0.3,
+      ),
+      Container(
+        child: TransactionList(_userTransaction, _deleteTransaction),
+        height: (mediaQuery.size.height -
+                appBar.preferredSize.height -
+                mediaQuery.padding.top) *
+            0.6,
+      )
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
-    final isLasndScape =
+    final isLandScape =
         MediaQuery.of(context).orientation == Orientation.landscape;
+    //
     final CuAppBar = CupertinoNavigationBar(
       middle: Text('Expenses Recorder'),
       trailing: GestureDetector(
@@ -185,9 +256,10 @@ class _MyHomePageState extends State<MyHomePage> {
         onTap: () => _startTransaction(context),
       ),
     );
-    final PreferredSizeWidget appBar = Platform.isIOS
+    //
+    final appBar = Platform.isIOS
         ? PreferredSize(
-            preferredSize: Size.fromHeight(mediaQuery.size.height * 0.08),
+            preferredSize: Size.fromHeight(10),
             child: CupertinoNavigationBar(
               middle: Text('Expenses Recorder'),
               trailing: GestureDetector(
@@ -207,7 +279,7 @@ class _MyHomePageState extends State<MyHomePage> {
               )
             ],
           );
-
+//
     final chartContainer = Container(
       child: Chart(_userTransaction),
       height: (mediaQuery.size.height -
@@ -215,6 +287,7 @@ class _MyHomePageState extends State<MyHomePage> {
               mediaQuery.padding.top) *
           0.3,
     );
+    //
     final txListContainer = Container(
       child: TransactionList(_userTransaction, _deleteTransaction),
       height: (mediaQuery.size.height -
@@ -222,46 +295,18 @@ class _MyHomePageState extends State<MyHomePage> {
               mediaQuery.padding.top) *
           0.6,
     );
+    //
     final pagebody = SafeArea(
       child: Column(
         // mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (isLasndScape)
-                Switch.adaptive(
-                    value: _showchart,
-                    onChanged: (val) {
-                      setState(() {
-                        _showchart = val;
-                      });
-                    }),
-            ],
-          ),
-          if (isLasndScape)
-            _showchart
-                ? Container(
-                    child: Chart(_userTransaction),
-                    height: (mediaQuery.size.height -
-                            appBar.preferredSize.height -
-                            mediaQuery.padding.top) *
-                        0.7,
-                  )
-                : Container(
-                    child:
-                        TransactionList(_userTransaction, _deleteTransaction),
-                    height: (mediaQuery.size.height -
-                            appBar.preferredSize.height -
-                            mediaQuery.padding.top) *
-                        0.5,
-                  ),
-          if (!isLasndScape) chartContainer,
-          if (!isLasndScape) txListContainer,
+          if (isLandScape) ..._buildLandScapeContent(mediaQuery, appBar),
+          if (!isLandScape) ..._buildPortraitContent(mediaQuery, appBar),
         ],
       ),
     );
+    //
     return Platform.isIOS
         ? CupertinoPageScaffold(
             child: pagebody,
